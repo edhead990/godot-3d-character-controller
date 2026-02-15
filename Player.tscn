@@ -1,0 +1,30 @@
+[gd_scene format=3 uid="uid://bgcmobpad10l3"]
+
+[ext_resource type="Script" uid="uid://bgtvo3qw177go" path="res://Player.gd" id="1_ctiar"]
+[ext_resource type="Script" uid="uid://b6u2kskw00ifg" path="res://Camera.gd" id="1_kne1u"]
+[ext_resource type="PackedScene" uid="uid://cdydadcjk2nhb" path="res://character.gltf" id="2_r5a6n"]
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_tar8q"]
+radius = 0.25
+
+[node name="Player" type="Node3D" unique_id=989082630]
+
+[node name="CameraController" type="Node3D" parent="." unique_id=1382801761 node_paths=PackedStringArray("player")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+script = ExtResource("1_kne1u")
+player = NodePath("../CharacterBody3D")
+
+[node name="Camera3D" type="Camera3D" parent="CameraController" unique_id=243302581]
+transform = Transform3D(1, 0, -1.74846e-07, 0, 1, 0, 1.74846e-07, 0, 1, 0, 0, 2.8)
+current = true
+
+[node name="CharacterBody3D" type="CharacterBody3D" parent="." unique_id=1310899320 node_paths=PackedStringArray("camera_controller")]
+script = ExtResource("1_ctiar")
+camera_controller = NodePath("../CameraController")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="CharacterBody3D" unique_id=1773685275]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+shape = SubResource("CylinderShape3D_tar8q")
+
+[node name="character" parent="CharacterBody3D" unique_id=1772268233 instance=ExtResource("2_r5a6n")]
+transform = Transform3D(-1, 0, 8.74228e-08, 0, 1, 0, -8.74228e-08, 0, -1, -0.0122805, 0, -0.000314713)
