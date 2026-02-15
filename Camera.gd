@@ -3,12 +3,21 @@ extends Node3D
 @export var player: CharacterBody3D
 
 const SPEED = 5.0
+const MOUSE_X_SENSITIVITY = 0.5
+const MOUSE_Y_SENSITIVITY = 0.25
 
 var y_offset
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	y_offset = global_position.y
+	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+
+
+func _input(event):
+	if event is InputEventMouseMotion:
+		rotation.y += deg_to_rad(-event.relative.x * MOUSE_X_SENSITIVITY)
+		rotation.x += deg_to_rad(-event.relative.y * MOUSE_Y_SENSITIVITY)
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
