@@ -18,6 +18,7 @@ func _input(event):
 	if event is InputEventMouseMotion:
 		rotation.y += deg_to_rad(-event.relative.x * MOUSE_X_SENSITIVITY)
 		rotation.x += deg_to_rad(-event.relative.y * MOUSE_Y_SENSITIVITY)
+		rotation.x = clamp(rotation.x, deg_to_rad(-89), deg_to_rad(30))
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -32,3 +33,4 @@ func _process(delta):
 	if direction:
 		rotation.y += -direction.x * (SPEED * delta)
 		rotation.x += -direction.z * (SPEED * delta)
+		rotation.x = clamp(rotation.x, deg_to_rad(-89), deg_to_rad(30))
