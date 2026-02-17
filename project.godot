@@ -14,9 +14,9 @@ compatibility/default_parent_skeleton_in_mesh_instance_3d=true
 
 [application]
 
-config/name="3D Template"
+config/name="godot-3d-character-controller"
 run/main_scene="res://Main.tscn"
-config/features=PackedStringArray("4.6", "Forward Plus")
+config/features=PackedStringArray("4.5", "Forward Plus")
 config/icon="res://icon.svg"
 
 [filesystem]
@@ -77,6 +77,42 @@ camera_down={
 }
 camera_reset={
 "deadzone": 0.2,
-"events": [Object(InputEventJoypadButton,"resource_local_to_scene":false,"resource_name":"","device":-1,"button_index":8,"pressure":0.0,"pressed":false,"script":null)
-]
+"events": Array[InputEvent]([Object(InputEventJoypadButton,"resource_local_to_scene":false,"resource_name":"","device":-1,"button_index":8,"pressure":0.0,"pressed":false,"script":null)
+])
+}
+strafe={
+"deadzone": 0.5,
+"events": Array[InputEvent]([Object(InputEventJoypadMotion,"resource_local_to_scene":false,"resource_name":"","device":-1,"axis":4,"axis_value":1.0,"script":null)
+])
+}
+aim={
+"deadzone": 0.5,
+"events": Array[InputEvent]([Object(InputEventJoypadMotion,"resource_local_to_scene":false,"resource_name":"","device":-1,"axis":5,"axis_value":1.0,"script":null)
+])
+}
+
+[input_devices]
+
+virtual_controller/ios/enable_controller=true
+
+[rendering]
+
+renderer/rendering_method="forward_plus"
+
+[xogot]
+
+project/editorState=[{
+"column": 0,
+"line": 0,
+"path": "res://Camera.gd",
+"type": "file"
+}, {
+"column": 0,
+"current": true,
+"line": 59,
+"path": "res://Player.gd",
+"type": "file"
+}]
+project/breakpoints={
+"res://Camera.gd": PackedInt32Array()
 }
