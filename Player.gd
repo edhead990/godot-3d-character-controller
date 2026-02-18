@@ -1,6 +1,7 @@
 extends CharacterBody3D
 
 @export var camera_controller = Node3D
+@export var joystick_bounce_threshold: float = 1.05
 
 const SPEED: float = 5.0
 const JUMP_VELOCITY: float = 4.5
@@ -8,6 +9,8 @@ const JUMP_VELOCITY: float = 4.5
 # Get the gravity from the project settings to be synced with RigidBody nodes.
 var gravity = ProjectSettings.get_setting("physics/3d/default_gravity")
 var previous_direction: Vector3 = Vector3.ZERO
+var is_rotating: bool = false
+var target_y_rotation: float
 
 func _physics_process(delta):
 	# Add the gravity.
@@ -22,23 +25,25 @@ func _physics_process(delta):
 	var input_dir = Input.get_vector("move_left", "move_right", "move_up", "move_down")
 	var direction = Vector3(input_dir.x, 0, input_dir.y).rotated(Vector3.UP, camera_controller.rotation.y).normalized()
 
-	if camera_controller.is_resetting:
-		direction = Vector3.ZERO
-
-	var valid_x_direction = abs(previous_direction.x - direction.x) < 1.5
-	var valid_z_direction = abs(previous_direction.z - direction.z) < 1.5
+	# Ignore joystick bounce/flicks
+	var valid_x_direction = abs(previous_direction.x - direction.x) < joystick_bounce_threshold
+	var valid_z_direction = abs(previous_direction.z - direction.z) < joystick_bounce_threshold
+	previous_direction = direction
 
 	if direction and valid_x_direction and valid_z_direction:
 		velocity.x = direction.x * SPEED
 		velocity.z = direction.z * SPEED
-		# Smooth rotation in the movement direction
-		# rotation.y = lerp_angle(rotation.y, atan2(-velocity.x, -velocity.z), 12.0 * delta)
-		# Alternative: Instant rotation
-		rotation.y = atan2(-velocity.x, -velocity.z)
+		target_y_rotation = atan2(-direction.x, -direction.z)
+		is_rotating = true
 	else:
 		velocity.x = move_toward(velocity.x, 0, SPEED)
 		velocity.z = move_toward(velocity.z, 0, SPEED)
 
-	previous_direction = direction
+	# Smoothly rotate the player independent of the input
+	if is_rotating:
+		if abs(angle_difference(rotation.y, target_y_rotation)) <= 0.01:
+			is_rotating = false
+		else:
+			rotation.y = lerp_angle(rotation.y, target_y_rotation, 0.25)
 
 	move_and_slide()
