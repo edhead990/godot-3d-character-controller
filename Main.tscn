@@ -2,6 +2,9 @@
 
 [ext_resource type="PackedScene" uid="uid://bgcmobpad10l3" path="res://Player.tscn" id="1_66g24"]
 [ext_resource type="Texture2D" uid="uid://dd5bco6gmti0d" path="res://addons/kenney_prototype_textures/dark/texture_04.png" id="1_uu6xs"]
+[ext_resource type="Texture2D" uid="uid://el257c1pk1xq" path="res://addons/kenney_prototype_textures/orange/texture_09.png" id="2_fos0i"]
+[ext_resource type="Texture2D" uid="uid://doi75lte3muu" path="res://addons/kenney_prototype_textures/purple/texture_09.png" id="3_3dxm6"]
+[ext_resource type="Texture2D" uid="uid://dpi6fdd6lagpd" path="res://addons/kenney_prototype_textures/green/texture_09.png" id="4_lgr22"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_hvajl"]
 sky_top_color = Color(0, 0.466667, 0.752941, 1)
@@ -16,9 +19,20 @@ sky = SubResource("Sky_n0oco")
 tonemap_mode = 2
 glow_enabled = true
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_uu6xs"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_fos0i"]
 albedo_texture = ExtResource("1_uu6xs")
-uv1_scale = Vector3(10, 10, 10)
+uv1_triplanar = true
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_trn2v"]
+albedo_texture = ExtResource("2_fos0i")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_03owx"]
+albedo_texture = ExtResource("3_3dxm6")
+uv1_triplanar = true
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_wkp8b"]
+albedo_texture = ExtResource("4_lgr22")
+uv1_triplanar = true
 
 [node name="World" type="Node3D" unique_id=1299773167]
 
@@ -33,8 +47,25 @@ environment = SubResource("Environment_f01wa")
 
 [node name="GroundPlane" type="CSGBox3D" parent="Map" unique_id=489025788]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+material_override = SubResource("StandardMaterial3D_fos0i")
 use_collision = true
 size = Vector3(100, 1, 100)
-material = SubResource("StandardMaterial3D_uu6xs")
+
+[node name="CSGBox3D" type="CSGBox3D" parent="Map" unique_id=149011258]
+transform = Transform3D(0.87554044, 0, 0.48314485, 0, 1, 0, -0.48314485, 0, 0.87554044, -1.8773098, 0.5, -4.484215)
+material_override = SubResource("StandardMaterial3D_trn2v")
+use_collision = true
+
+[node name="CSGBox3D2" type="CSGBox3D" parent="Map" unique_id=400289350]
+transform = Transform3D(0.87554044, 0, 0.48314485, 0, 1, 0, -0.48314485, 0, 0.87554044, 10.12269, 1, 3.5157852)
+material_override = SubResource("StandardMaterial3D_03owx")
+use_collision = true
+size = Vector3(2, 2, 2)
+
+[node name="CSGBox3D3" type="CSGBox3D" parent="Map" unique_id=399061602]
+transform = Transform3D(0.9491016, 0, -0.31496993, 0, 1, 0, 0.31496993, 0, 0.9491016, -3.877, 1.5, 5.516)
+material_override = SubResource("StandardMaterial3D_wkp8b")
+use_collision = true
+size = Vector3(3, 3, 3)
 
 [node name="CharacterBody3D" parent="." unique_id=263052077 instance=ExtResource("1_66g24")]
