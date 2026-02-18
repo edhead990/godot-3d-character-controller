@@ -11,6 +11,7 @@ var gravity = ProjectSettings.get_setting("physics/3d/default_gravity")
 var previous_direction: Vector3 = Vector3.ZERO
 var is_rotating: bool = false
 var target_y_rotation: float
+var is_crouching: bool = false
 
 func _physics_process(delta):
 	# Add the gravity.
@@ -18,8 +19,12 @@ func _physics_process(delta):
 		velocity.y -= gravity * delta
 
 	# Handle jump.
-	if Input.is_action_just_pressed("jump") and is_on_floor():
+	if Input.is_action_just_pressed("jump") and is_on_floor() and not is_crouching:
 		velocity.y = JUMP_VELOCITY
+
+	# Handle crouch
+	if Input.is_action_just_pressed("crouch") and is_on_floor():
+		is_crouching = not is_crouching
 
 	# Get the input direction and handle the movement/deceleration.
 	var input_dir = Input.get_vector("move_left", "move_right", "move_up", "move_down")
@@ -30,14 +35,18 @@ func _physics_process(delta):
 	var valid_z_direction = abs(previous_direction.z - direction.z) < joystick_bounce_threshold
 	previous_direction = direction
 
+	var speed = SPEED
+	if is_crouching:
+		speed = SPEED / 2
+
 	if direction and valid_x_direction and valid_z_direction:
-		velocity.x = direction.x * SPEED
-		velocity.z = direction.z * SPEED
+		velocity.x = direction.x * speed
+		velocity.z = direction.z * speed
 		target_y_rotation = atan2(-direction.x, -direction.z)
 		is_rotating = true
 	else:
-		velocity.x = move_toward(velocity.x, 0, SPEED)
-		velocity.z = move_toward(velocity.z, 0, SPEED)
+		velocity.x = move_toward(velocity.x, 0, speed)
+		velocity.z = move_toward(velocity.z, 0, speed)
 
 	# Smoothly rotate the player independent of the input
 	if is_rotating:
