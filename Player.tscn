@@ -21,6 +21,9 @@
 [ext_resource type="Animation" uid="uid://xlmnvx8ecve" path="res://animations/walk backward.res" id="18_m7dl7"]
 [ext_resource type="Animation" uid="uid://dmcargpcnts7k" path="res://animations/walk forward.res" id="19_48og4"]
 
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_kne1u"]
+points = PackedVector3Array(0, 0, 0, -20, 11.5, -15, 20, 11.5, -15, -20, -11.5, -15, 20, -11.5, -15)
+
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_kne1u"]
 radius = 0.31689453
 height = 1.8291016
@@ -45,19 +48,34 @@ _data = {
 &"walk forward": ExtResource("19_48og4")
 }
 
-[node name="Player" type="Node3D" unique_id=989082630]
+[node name="Player" type="Node3D" unique_id=2129451168]
 
-[node name="CameraController" type="Node3D" parent="." unique_id=1382801761 node_paths=PackedStringArray("player")]
-transform = Transform3D(1, 0, 0, 0, 0.98480767, 0.17364816, 0, -0.17364816, 0.98480767, 0, 1.5, 0)
+[node name="CameraController" type="Node3D" parent="." unique_id=1382801761 node_paths=PackedStringArray("player", "view")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
 script = ExtResource("1_kne1u")
 player = NodePath("../CharacterBody3D")
+view = NodePath("SpringArm3D/View")
 mouse_enabled = false
 
-[node name="Camera3D" type="Camera3D" parent="CameraController" unique_id=243302581]
-transform = Transform3D(1, 0, -1.74846e-07, 0, 1, 0, 1.74846e-07, 0, 1, 0, 0, 2.8)
+[node name="SpringArm3D" type="SpringArm3D" parent="CameraController" unique_id=831668742]
+spring_length = 2.8
+
+[node name="Camera3D" type="Camera3D" parent="CameraController/SpringArm3D" unique_id=651407827]
+transform = Transform3D(1, 0, -1.74846e-07, 0, 1, 0, 1.74846e-07, 0, 1, 0, 0, 0)
 current = true
 
-[node name="CharacterBody3D" type="CharacterBody3D" parent="." unique_id=1310899320 node_paths=PackedStringArray("camera_controller")]
+[node name="View" type="Area3D" parent="CameraController/SpringArm3D" unique_id=779693056]
+collision_mask = 2
+monitorable = false
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="CameraController/SpringArm3D/View" unique_id=1825032105]
+shape = SubResource("ConvexPolygonShape3D_kne1u")
+
+[node name="LineOfSite" type="RayCast3D" parent="CameraController/SpringArm3D/View" unique_id=1275852624]
+collision_mask = 2
+
+[node name="CharacterBody3D" type="CharacterBody3D" parent="." unique_id=1387822813 node_paths=PackedStringArray("camera_controller")]
+wall_min_slide_angle = 0.26209256
 script = ExtResource("1_ctiar")
 camera_controller = NodePath("../CameraController")
 
@@ -76,3 +94,6 @@ root_node = NodePath("../character")
 tree_root = ExtResource("4_e80uo")
 advance_expression_base_node = NodePath("..")
 anim_player = NodePath("../character/AnimationPlayer")
+
+[connection signal="body_entered" from="CameraController/SpringArm3D/View" to="CameraController" method="_on_body_entered"]
+[connection signal="body_exited" from="CameraController/SpringArm3D/View" to="CameraController" method="_on_body_exited"]
