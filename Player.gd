@@ -1,12 +1,13 @@
 extends CharacterBody3D
 
 @export var camera_controller = Node3D
+@export var joystick_bounce_threshold: float = 1.05
 
 @onready var view: Area3D = get_parent().get_node("CameraController/SpringArm3D/View")
 @onready var line_of_site: RayCast3D = get_parent().get_node("CameraController/SpringArm3D/View/LineOfSite")
 
-const SPEED = 5.0
-const JUMP_VELOCITY = 4.5
+const SPEED: float = 5.0
+const JUMP_VELOCITY: float = 4.5
 
 var is_aiming = false
 var is_strafing = false
@@ -15,7 +16,10 @@ var current_target: Node3D = null
 
 # Get the gravity from the project settings to be synced with RigidBody nodes.
 var gravity = ProjectSettings.get_setting("physics/3d/default_gravity")
-
+var previous_direction: Vector3 = Vector3.ZERO
+var is_rotating: bool = false
+var target_y_rotation: float
+var is_crouching: bool = false
 
 func _physics_process(delta):
 	# Add the gravity.
@@ -24,7 +28,7 @@ func _physics_process(delta):
 
 	# Handle jump.
 	# TODO: Consider adding buffer?
-	if Input.is_action_just_pressed("jump") and is_on_floor():
+	if Input.is_action_just_pressed("jump") and is_on_floor() and not is_crouching:
 		velocity.y = JUMP_VELOCITY
 
 	# Handle aim state
@@ -32,6 +36,10 @@ func _physics_process(delta):
 		is_aiming = true
 	else:
 		is_aiming = false
+
+	# Handle crouch
+	if Input.is_action_just_pressed("crouch") and is_on_floor():
+		is_crouching = not is_crouching
 		
 	# Handle strafe/targeting
 	if Input.is_action_just_pressed("strafe"):
@@ -50,14 +58,24 @@ func _physics_process(delta):
 	# Get the input direction and handle the movement/deceleration.
 	var input_dir = Input.get_vector("move_left", "move_right", "move_up", "move_down")
 	var direction = Vector3(input_dir.x, 0, input_dir.y).rotated(Vector3.UP, camera_controller.rotation.y).normalized()
+
+	# Ignore joystick bounce/flicks
+	var valid_x_direction = abs(previous_direction.x - direction.x) < joystick_bounce_threshold
+	var valid_z_direction = abs(previous_direction.z - direction.z) < joystick_bounce_threshold
+	previous_direction = direction
+
+	var speed = SPEED
+	if is_crouching:
+		speed = SPEED / 2
 		
-	if direction:
-		velocity.x = direction.x * SPEED
-		velocity.z = direction.z * SPEED
-		
+	if direction and valid_x_direction and valid_z_direction:
+		velocity.x = direction.x * speed
+		velocity.z = direction.z * speed
+		target_y_rotation = atan2(-direction.x, -direction.z)
+		is_rotating = true
 	else:
-		velocity.x = move_toward(velocity.x, 0, SPEED)
-		velocity.z = move_toward(velocity.z, 0, SPEED)
+		velocity.x = move_toward(velocity.x, 0, speed)
+		velocity.z = move_toward(velocity.z, 0, speed)
 		
 	if current_target and is_instance_valid(current_target):
 		# Lock on
@@ -70,9 +88,12 @@ func _physics_process(delta):
 	elif is_strafing:
 		rotation.y = strafe_rotation
 		
-	elif direction:
-		# Smooth rotation in the movement direction
-		rotation.y = lerp_angle(rotation.y, atan2(-velocity.x, -velocity.z), 12.0 * delta)
+	elif is_rotating:
+		# Smoothly rotate the player independent of the input
+		if abs(angle_difference(rotation.y, target_y_rotation)) <= 0.01:
+			is_rotating = false
+		else:
+			rotation.y = lerp_angle(rotation.y, target_y_rotation, 0.25)
 		
 	move_and_slide()
 
@@ -99,4 +120,5 @@ func get_best_target() -> Node3D:
 		if score > highest_score:
 			highest_score = score
 			best_target = enemy
+
 	return best_target
