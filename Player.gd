@@ -84,9 +84,11 @@ func _physics_process(delta):
 		# Smooth rotation toward the target
 		var target_basis = transform.looking_at(look_pos).basis
 		transform.basis = transform.basis.slerp(target_basis, 12.0 * delta)
+		is_rotating = false
 		
 	elif is_strafing:
 		rotation.y = strafe_rotation
+		is_rotating = false
 		
 	elif is_rotating:
 		# Smoothly rotate the player independent of the input
@@ -102,12 +104,14 @@ func get_best_target() -> Node3D:
 	var enemies = view.get_overlapping_bodies()
 	var best_target = null
 	var highest_score = -1.0 # Dot product range -1 to 1
+
+	line_of_site.enabled = true
 	
 	for enemy in enemies:
 		if not enemy.is_in_group("enemy"): continue
 		
 		# Line of site check
-		line_of_site.look_at(enemy.global_position)
+		line_of_site.target_position = line_of_site.to_local(enemy.global_position)
 		line_of_site.force_raycast_update()
 		if line_of_site.is_colliding(): continue # Blocked by wall
 		
@@ -120,5 +124,8 @@ func get_best_target() -> Node3D:
 		if score > highest_score:
 			highest_score = score
 			best_target = enemy
+
+	line_of_site.target_position = Vector3.DOWN
+	line_of_site.enabled = false
 
 	return best_target
