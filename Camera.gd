@@ -1,15 +1,19 @@
 extends Node3D
 
-@export var player: CharacterBody3D
-@export var view: Area3D
 @export var reset_speed: float = 10.0 # Adjust for "snappiness"
 @export var reset_threshold: float = 0.01
 @export var joystick_sensitivity: Vector2 = Vector2(2.5, 2.0)
 @export var mouse_sensitivity: Vector2 = Vector2(0.25, 0.125)
 @export var mouse_enabled: bool = true
 
+@onready var player: CharacterBody3D = get_parent().get_node("CharacterBody3D")
+@onready var view: Area3D = get_node("SpringArm3D/View")
+@onready var springarm: SpringArm3D = get_node("SpringArm3D")
+@onready var ui: Control = get_parent().get_node("UserInterface")
+
 var initial_position: Vector3
 var initial_rotation: Vector3
+var aiming_offset: Vector3 = Vector3(0.5, 0, 0)
 var is_resetting: bool = false
 var reset_to: Vector2
 
@@ -33,6 +37,12 @@ func _process(delta):
 	global_position.x = player.global_position.x + initial_position.x
 	global_position.y = player.global_position.y + initial_position.y
 	global_position.z = player.global_position.z + initial_position.z
+	
+	if Input.is_action_just_pressed("aim"):
+		enter_aim_mode()
+	
+	if Input.is_action_just_released("aim"):
+		exit_aim_mode()
 
 	var current_target = player.current_target
 	
@@ -41,6 +51,7 @@ func _process(delta):
 		var dir_to_enemy = (current_target.global_position - player.global_position).normalized()
 		var target_yaw = atan2(-dir_to_enemy.x, -dir_to_enemy.z)
 		var target_pitch = -0.3
+		
 		# Rotate from pivot point
 		rotation.y = lerp_angle(rotation.y, target_yaw, 5.0 * delta)
 		rotation.x = lerp_angle(rotation.x, target_pitch, 5.0 * delta)
@@ -59,9 +70,11 @@ func _process(delta):
 				rotation.x += -direction.z * (joystick_sensitivity.y * delta)
 				rotation.x = clamp(rotation.x, deg_to_rad(-89), deg_to_rad(30))
 
+
 func start_camera_reset(target_y_rotation):
 	reset_to = Vector2(initial_rotation.x, target_y_rotation)
 	is_resetting = true
+
 
 func _perform_reset_step(delta):
 	var x_is_reset = abs(angle_difference(rotation.x, reset_to.x)) <= reset_threshold
@@ -72,3 +85,17 @@ func _perform_reset_step(delta):
 	else:
 		rotation.x = lerp_angle(rotation.x, reset_to.x, reset_speed * delta)
 		rotation.y = lerp_angle(rotation.y, reset_to.y, reset_speed * delta)
+
+
+func enter_aim_mode():
+	ui.get_node("Reticle").visible = true
+	var tween = create_tween().set_parallel(true).set_trans(Tween.TRANS_CUBIC)
+	tween.tween_property(springarm, "position", aiming_offset, 0.2)
+	tween.tween_property(springarm, "spring_length", 1.0, 0.2)
+
+
+func exit_aim_mode():
+	ui.get_node("Reticle").visible = false
+	var tween = create_tween().set_parallel(true).set_trans(Tween.TRANS_CUBIC)
+	tween.tween_property(springarm, "position", Vector3.ZERO, 0.2)
+	tween.tween_property(springarm, "spring_length", 2.8, 0.2)
