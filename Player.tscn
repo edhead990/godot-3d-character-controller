@@ -24,8 +24,7 @@ mouse_enabled = false
 [node name="SpringArm3D" type="SpringArm3D" parent="CameraController"]
 spring_length = 2.8
 
-[node name="Camera3D" type="Camera3D" parent="CameraController/SpringArm3D"]
-transform = Transform3D(1, 0, -1.74846e-07, 0, 1, 0, 1.74846e-07, 0, 1, 0, 0, 0)
+[node name="Camera3D" type="Camera3D" parent="CameraController/SpringArm3D" unique_id=651407827]
 current = true
 
 [node name="View" type="Area3D" parent="CameraController/SpringArm3D"]
@@ -35,8 +34,9 @@ monitorable = false
 [node name="CollisionShape3D" type="CollisionShape3D" parent="CameraController/SpringArm3D/View"]
 shape = SubResource("ConvexPolygonShape3D_kne1u")
 
-[node name="LineOfSite" type="RayCast3D" parent="CameraController/SpringArm3D/View"]
-collision_mask = 2
+[node name="LineOfSite" type="RayCast3D" parent="CameraController/SpringArm3D/View" unique_id=1275852624]
+enabled = false
+collision_mask = 4
 
 [node name="CharacterBody3D" type="CharacterBody3D" parent="."]
 wall_min_slide_angle = 0.26209256
