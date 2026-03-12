@@ -1,25 +1,11 @@
-[gd_scene format=3 uid="uid://bgcmobpad10l3"]
+[gd_scene load_steps=9 format=3 uid="uid://bgcmobpad10l3"]
 
 [ext_resource type="Script" uid="uid://bgtvo3qw177go" path="res://Player.gd" id="1_ctiar"]
 [ext_resource type="Script" uid="uid://b6u2kskw00ifg" path="res://Camera.gd" id="1_kne1u"]
 [ext_resource type="PackedScene" uid="uid://cdydadcjk2nhb" path="res://character.gltf" id="2_r5a6n"]
-[ext_resource type="Animation" uid="uid://d4d5q8aepkwsg" path="res://animations/crouch idle.res" id="4_cgsek"]
+[ext_resource type="AnimationLibrary" uid="uid://cf1bkkgghv20q" path="res://animations/AnimationLibrary1.res" id="4_cxr5p"]
 [ext_resource type="AnimationNodeStateMachine" uid="uid://vd1ofxpq4js0" path="res://animations/player_animation_node_state_machine.res" id="4_e80uo"]
-[ext_resource type="Animation" uid="uid://5bjeq3h2h7oe" path="res://animations/crouch to prone.res" id="5_0pi4m"]
-[ext_resource type="Animation" uid="uid://shvkk1h65258" path="res://animations/crouch to standing.res" id="6_sg6sq"]
-[ext_resource type="Animation" uid="uid://cg7mp5hr0hy2x" path="res://animations/crouch walk forward.res" id="7_h84ma"]
-[ext_resource type="Animation" uid="uid://byapulwdao801" path="res://animations/idle.res" id="8_47wu6"]
-[ext_resource type="Animation" uid="uid://c25teiwtoqdq7" path="res://animations/jump.res" id="9_2n1s8"]
-[ext_resource type="Animation" uid="uid://cj7nrskqqcjob" path="res://animations/jump 2.res" id="10_3vjad"]
-[ext_resource type="Animation" uid="uid://crhgk16rft1pb" path="res://animations/prone backward.res" id="11_yt0h1"]
-[ext_resource type="Animation" uid="uid://c7xlpvcywkgt6" path="res://animations/prone forward.res" id="12_vd78s"]
-[ext_resource type="Animation" uid="uid://y5462iqqpror" path="res://animations/prone idle.res" id="13_ictha"]
-[ext_resource type="Animation" uid="uid://bjnb1p18lwexn" path="res://animations/prone to crouch.res" id="14_1jgrc"]
-[ext_resource type="Animation" uid="uid://dedan3ieiqeea" path="res://animations/run forward.res" id="15_7wy67"]
-[ext_resource type="Animation" uid="uid://e3pxesf20yqs" path="res://animations/standing to crouch.res" id="16_q26ax"]
-[ext_resource type="Animation" uid="uid://dwhdljaikb12o" path="res://animations/t-pose.res" id="17_p01ps"]
-[ext_resource type="Animation" uid="uid://xlmnvx8ecve" path="res://animations/walk backward.res" id="18_m7dl7"]
-[ext_resource type="Animation" uid="uid://dmcargpcnts7k" path="res://animations/walk forward.res" id="19_48og4"]
+[ext_resource type="Script" uid="uid://spsh3g0o2do5" path="res://reticle.gd" id="6_tdg3f"]
 
 [sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_kne1u"]
 points = PackedVector3Array(0, 0, 0, -20, 11.5, -15, 20, 11.5, -15, -20, -11.5, -15, 20, -11.5, -15)
@@ -28,72 +14,78 @@ points = PackedVector3Array(0, 0, 0, -20, 11.5, -15, 20, 11.5, -15, -20, -11.5, 
 radius = 0.31689453
 height = 1.8291016
 
-[sub_resource type="AnimationLibrary" id="AnimationLibrary_kne1u"]
-_data = {
-&"crouch idle": ExtResource("4_cgsek"),
-&"crouch to prone": ExtResource("5_0pi4m"),
-&"crouch to standing": ExtResource("6_sg6sq"),
-&"crouch walk forward": ExtResource("7_h84ma"),
-&"idle": ExtResource("8_47wu6"),
-&"jump": ExtResource("9_2n1s8"),
-&"jump 2": ExtResource("10_3vjad"),
-&"prone backward": ExtResource("11_yt0h1"),
-&"prone forward": ExtResource("12_vd78s"),
-&"prone idle": ExtResource("13_ictha"),
-&"prone to crouch": ExtResource("14_1jgrc"),
-&"run forward": ExtResource("15_7wy67"),
-&"standing to crouch": ExtResource("16_q26ax"),
-&"t-pose": ExtResource("17_p01ps"),
-&"walk backward": ExtResource("18_m7dl7"),
-&"walk forward": ExtResource("19_48og4")
-}
+[node name="Player" type="Node3D"]
 
-[node name="Player" type="Node3D" unique_id=2129451168]
-
-[node name="CameraController" type="Node3D" parent="." unique_id=1382801761 node_paths=PackedStringArray("player", "view")]
+[node name="CameraController" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
 script = ExtResource("1_kne1u")
-player = NodePath("../CharacterBody3D")
-view = NodePath("SpringArm3D/View")
 mouse_enabled = false
 
-[node name="SpringArm3D" type="SpringArm3D" parent="CameraController" unique_id=831668742]
+[node name="SpringArm3D" type="SpringArm3D" parent="CameraController"]
 spring_length = 2.8
 
 [node name="Camera3D" type="Camera3D" parent="CameraController/SpringArm3D" unique_id=651407827]
 current = true
 
-[node name="View" type="Area3D" parent="CameraController/SpringArm3D" unique_id=779693056]
+[node name="View" type="Area3D" parent="CameraController/SpringArm3D"]
 collision_mask = 2
 monitorable = false
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="CameraController/SpringArm3D/View" unique_id=1825032105]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="CameraController/SpringArm3D/View"]
 shape = SubResource("ConvexPolygonShape3D_kne1u")
 
 [node name="LineOfSite" type="RayCast3D" parent="CameraController/SpringArm3D/View" unique_id=1275852624]
 enabled = false
 collision_mask = 4
 
-[node name="CharacterBody3D" type="CharacterBody3D" parent="." unique_id=1387822813 node_paths=PackedStringArray("camera_controller")]
+[node name="CharacterBody3D" type="CharacterBody3D" parent="."]
 wall_min_slide_angle = 0.26209256
 script = ExtResource("1_ctiar")
-camera_controller = NodePath("../CameraController")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="CharacterBody3D" unique_id=1773685275]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="CharacterBody3D"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9145508, 0)
 shape = SubResource("CapsuleShape3D_kne1u")
 
-[node name="character" parent="CharacterBody3D" unique_id=828390254 instance=ExtResource("2_r5a6n")]
+[node name="character" parent="CharacterBody3D" instance=ExtResource("2_r5a6n")]
 transform = Transform3D(-1, 0, 8.74228e-08, 0, 1, 0, -8.74228e-08, 0, -1, 0, 0, 0)
 
-[node name="AnimationPlayer" type="AnimationPlayer" parent="CharacterBody3D/character" unique_id=349292174]
-libraries/AnimationLibrary1 = SubResource("AnimationLibrary_kne1u")
+[node name="AnimationPlayer" type="AnimationPlayer" parent="CharacterBody3D/character"]
+libraries = {
+&"AnimationLibrary1.res": ExtResource("4_cxr5p")
+}
 
-[node name="AnimationTree" type="AnimationTree" parent="CharacterBody3D" unique_id=162260716]
+[node name="AnimationTree" type="AnimationTree" parent="CharacterBody3D"]
 root_node = NodePath("../character")
 tree_root = ExtResource("4_e80uo")
 advance_expression_base_node = NodePath("..")
 anim_player = NodePath("../character/AnimationPlayer")
+
+[node name="UserInterface" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1
+
+[node name="Reticle" type="CenterContainer" parent="UserInterface"]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("6_tdg3f")
+dot_radius = 4.0
+dot_colour = Color(1, 1, 1, 1)
 
 [connection signal="body_entered" from="CameraController/SpringArm3D/View" to="CameraController" method="_on_body_entered"]
 [connection signal="body_exited" from="CameraController/SpringArm3D/View" to="CameraController" method="_on_body_exited"]

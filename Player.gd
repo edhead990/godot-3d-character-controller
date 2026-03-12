@@ -1,8 +1,8 @@
 extends CharacterBody3D
 
-@export var camera_controller = Node3D
 @export var joystick_bounce_threshold: float = 1.05
 
+@onready var camera_controller: Node3D = get_parent().get_node("CameraController")
 @onready var view: Area3D = get_parent().get_node("CameraController/SpringArm3D/View")
 @onready var line_of_site: RayCast3D = get_parent().get_node("CameraController/SpringArm3D/View/LineOfSite")
 
@@ -32,9 +32,9 @@ func _physics_process(delta):
 		velocity.y = JUMP_VELOCITY
 
 	# Handle aim state
-	if Input.is_action_pressed("aim"):
+	if Input.is_action_just_pressed("aim"):
 		is_aiming = true
-	else:
+	if Input.is_action_just_released("aim"):
 		is_aiming = false
 
 	# Handle crouch
@@ -85,6 +85,10 @@ func _physics_process(delta):
 		var target_basis = transform.looking_at(look_pos).basis
 		transform.basis = transform.basis.slerp(target_basis, 12.0 * delta)
 		is_rotating = false
+		
+	elif is_aiming:
+		rotation.y = camera_controller.rotation.y
+        is_rotating = false
 		
 	elif is_strafing:
 		rotation.y = strafe_rotation
